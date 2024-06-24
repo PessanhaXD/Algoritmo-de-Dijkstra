@@ -1,0 +1,81 @@
+/**
+autor: Rafael Pessanha (rafael.pessanha031@gmail.com)
+*/
+
+#Algortmo de Floyd
+
+from copy import deepcopy
+import networkx as nx
+import numpy as np
+
+#Dados para menu instrutivo de letras e números
+inf = float('inf')
+letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9 ,10]
+letra_numero = {letra: numero for letra, numero in zip(letras, numeros)}
+
+# Criação de matrizes 
+matriz = []
+caminhos = []
+arestas_ponderadas = []
+
+#Inserção de dados na matriz
+vertices = int(input('Digite quantos vertices tem no grafo: '))
+print('Para digitar os valores, utilize inf ou um número superior a 100 quando não for possivel chegar ao destino')
+
+for matriz_i in range(vertices):
+    linha = []
+    for matriz_j in range(vertices):
+        valor = input('Digite um valor para {} até {} para ser adicionado a Matriz: '.format(letras[matriz_i],letras[matriz_j]))
+        if valor.lower() == 'inf':
+            valor = inf
+        else:
+            valor = int(valor)
+        linha.append(valor)
+        if valor != inf and valor != 0:
+            caminhos.append((letras[matriz_i], letras[matriz_j],valor))
+    matriz.append(linha)
+tamanho_matriz = len(matriz)
+print('\n')
+
+matriz_predecessor = deepcopy(matriz)
+
+# Gerando arestas ponderadas para o grafo
+for i in range(len(matriz)):
+    for j in range(len(matriz[i])):
+        if matriz[i][j] != 0 and matriz[i][j] < 100:  # Ignorando zeros e valores maiores ou iguais a 100
+            arestas_ponderadas.append((letras[i].lower(), letras[j].lower(), matriz[i][j]))
+
+# Criação do grafo real
+G = nx.DiGraph()
+G.add_weighted_edges_from(arestas_ponderadas)
+predecessor, dist = nx.floyd_warshall_predecessor_and_distance(G)
+
+#Elaborando a matriz de predecessor
+for i in range(len(matriz)):
+    for j in range(len(matriz)):
+        if i == j:
+            matriz_predecessor[i][j] = i+1
+        else:
+            caminho = nx.reconstruct_path(letras[i].lower(), letras[j].lower(), predecessor)
+            if len(caminho) > 1:
+                matriz_predecessor[i][j] = caminho[-2]
+                matriz_predecessor[i][j] = letra_numero[matriz_predecessor[i][j].upper()]
+            else:
+                matriz_predecessor[i][j] = inf
+
+# Elaborando a matriz de menor distância
+for k in range(tamanho_matriz):
+    for i in range(tamanho_matriz):
+        for j in range(tamanho_matriz):
+            matriz[i][j] = min(matriz[i][j], matriz[i][k] + matriz[k][j])
+
+# Resultado da matriz de menor distância
+print("Matriz de Menor Distância:")
+for linha in matriz:
+    print(linha)
+print('\n')
+# Resultado da matriz de predecessor
+print("Matriz de Predecessor:")
+for linha in matriz_predecessor:
+    print(linha)
