@@ -1,0 +1,65 @@
+/**
+autor: Rafael Pessanha (rafael.pessanha031@gmail.com)
+*/
+
+#Algortmo de Djikstra
+
+import networkx as nx
+import numpy as np
+
+#Dados para menu instrutivo e criação da matriz
+letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+matriz = []
+
+inf = 0
+
+#Inserção de dados na matriz
+vertices = int(input('Digite quantos vertices tem no grafo:'))
+print('Para digitar os valores, utilize 0 quando não for possivel chegar ao destino, incluso quando a partida e o destino forem iguais')
+
+for matriz_i in range(vertices):
+    linha = []
+    for matriz_j in range(vertices):
+        valor = input('Digite um valor para {} até {} para ser adicionado a Matriz:'.format(letras[matriz_i],letras[matriz_j]))
+        if valor.lower() == 'inf':
+            valor = inf
+        else:
+            valor = int(valor)
+            if valor >= 100:
+                valor = inf
+        linha.append(valor)
+    matriz.append(linha)
+for linha_matriz in matriz:
+    print(linha_matriz)
+
+#Menu instrutivo
+print('\nTodos os valores foram inseridos a tabela matriz, iremos agora determina o melhor caminho!\n')
+
+print('Enviando a seguir o menu instrutivo, utilize:')
+for indice, letra in zip(range(len(matriz)), letras):
+    print(indice, 'para' , letra)
+
+#Pegando dados para identifcação de menor caminho
+ver = ''
+while True:
+    no_i = int(input('Digite o caminho do ponto de partida: '))
+    no_f = int(input('Digite o caminho final: '))
+
+    if 0 <= no_i <= 9:
+        ponto_partida = letras[no_i]
+    if 0 <= no_f <= 9:
+        ponto_final = letras[no_f]
+
+#Criação do grafo
+    grafo = nx.from_numpy_array(np.array(matriz))
+    menor_caminho = nx.dijkstra_path(grafo, no_i, no_f)
+
+#Identificação do menor caminhho
+    if all(matriz[menor_caminho[i]][menor_caminho[i + 1]] == 0 for i in range(len(menor_caminho) - 1)):
+        print('Não há caminho do {} até o ponto {}'.format(ponto_partida, ponto_final))
+    else:
+        print('O menor caminho do ponto {} até o ponto {} é: {}'.format(ponto_partida,ponto_final,menor_caminho))
+        ver = input ('Deseja continuar? Se sim aperte enter, se não digite stop').lower
+    if ver == 'stop':
+        break
+
